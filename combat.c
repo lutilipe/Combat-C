@@ -18,7 +18,7 @@ const float RADIUS_FORCE_FIELD = 30;
 const float RADIUS_SHOT = 6.0;
 
 const float TANK_SPEED = 2.5;
-const float TANK_SHOT_SPEED = 7.5;
+const float TANK_SHOT_SPEED = 10;
 const float TANK_ANGULAR_SPEED = M_PI/90;
 
 typedef struct Point {
@@ -154,14 +154,56 @@ void tankShot(Tank *t, int tank_shot) {
 
 void shotOutOfScreen(Tank *t, int *tank_shot) {
 	if (
-		t->shot.x > SCREEN_W + RADIUS_SHOT
-		|| t->shot.y > SCREEN_H + RADIUS_SHOT
-		|| t->shot.x < -SCREEN_W - RADIUS_SHOT
-		|| t->shot.y < -SCREEN_H - RADIUS_SHOT
+		t->shot.x + t->a >= SCREEN_W + RADIUS_SHOT
+		|| t->shot.y + t->b >= SCREEN_H + RADIUS_SHOT
+		|| t->shot.x + t->a <= 0 - RADIUS_SHOT
+		|| t->shot.y + t->b <= 0 - RADIUS_SHOT
 	) {
 		*tank_shot = 0;
 		t->shot.x = t->A.x;
 		t->shot.y = t->A.y;
+	}
+}
+
+void collisionTankScreen(Tank *t) {
+	if (t->center.x >= SCREEN_W - RADIUS_FORCE_FIELD) {
+		t->center.x = SCREEN_W - RADIUS_FORCE_FIELD;
+	} else if (t->center.x <= 0 + RADIUS_FORCE_FIELD) {
+		t->center.x = 0 + RADIUS_FORCE_FIELD;
+	} 
+	
+	if (t->center.y <= 0 + RADIUS_FORCE_FIELD) {
+		t->center.y = 0 + RADIUS_FORCE_FIELD;
+	} else if (t->center.y >= SCREEN_H - RADIUS_FORCE_FIELD) {
+		t->center.y = SCREEN_H - RADIUS_FORCE_FIELD;
+	} 
+}
+
+void collisionBetweenTanks(Tank *t1, Tank *t2) {
+	float distance_x = (t1->center.x - t2->center.x);
+	float distance_y = (t1->center.y - t2->center.y);
+	float sum_radius = RADIUS_FORCE_FIELD * 2;
+	float distanceBetweenCircles = sqrt(distance_x * distance_x + distance_y * distance_y);
+		printf("%.2f %.2f\n", t1->speed, t2->speed);
+
+	if (distanceBetweenCircles <= sum_radius) {
+		float distanceToMove = sum_radius - distanceBetweenCircles;
+
+		if (t1->speed < 0) {
+			t1->center.x += distanceToMove * t1->x_vec;
+			t1->center.y += distanceToMove * t1->y_vec;
+		} else if (t1->speed > 0) {
+			t1->center.x -= distanceToMove * t1->x_vec;
+			t1->center.y -= distanceToMove * t1->y_vec;
+		}
+
+		if (t2->speed < 0) {
+			t2->center.x += distanceToMove * t2->x_vec;
+			t2->center.y += distanceToMove * t2->y_vec;
+		} else if (t2->speed > 0){
+			t2->center.x -= distanceToMove * t2->x_vec;
+			t2->center.y -= distanceToMove * t2->y_vec;
+		}
 	}
 }
  
@@ -252,6 +294,11 @@ int main(int argc, char **argv){
 			updateTank(&tank_1, tank1_shot);
 			updateTank(&tank_2, tank2_shot);
 
+			collisionBetweenTanks(&tank_1, &tank_2);
+
+			collisionTankScreen(&tank_1);
+			collisionTankScreen(&tank_2);
+
 			tankShot(&tank_1, tank1_shot);
 			tankShot(&tank_2, tank2_shot);
 
@@ -259,9 +306,9 @@ int main(int argc, char **argv){
 			shotOutOfScreen(&tank_2, &tank2_shot);
 
 			drawTank(tank_1);
-			drawTank(tank_2);
-
 			drawShot(tank_1, tank1_shot);
+
+			drawTank(tank_2);
 			drawShot(tank_2, tank2_shot);
 
 			al_flip_display();
