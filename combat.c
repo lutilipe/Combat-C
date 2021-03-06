@@ -38,7 +38,10 @@ typedef struct Tank {
 	float angular_speed;
 	float shot_speed;
 	float angle;
-	float x_vec, y_vec, x_shot_vec, y_shot_vec, a, b;
+	float x_vec, y_vec, x_shot_vec, y_shot_vec;
+
+	int is_shooting;
+	int life;
 } Tank;
 
 ALLEGRO_COLOR generate_random_color() {
@@ -66,9 +69,6 @@ void createTank(Tank *t, float startX, float startY) {
 	t->C.x = w;
 	t->C.y = h;
 
-	t->a = 0;
-	t->b = 0;
-
 	t->shot_speed = -TANK_SHOT_SPEED;
 	t->speed = 0;
 	t->angular_speed = 0;
@@ -79,6 +79,9 @@ void createTank(Tank *t, float startX, float startY) {
 
 	t->x_shot_vec = cos(t->angle);
 	t->y_shot_vec = sin(t->angle);
+
+	t->is_shooting = 0;
+	t->life = 0;
 }
 
 void drawScenario() {
@@ -99,14 +102,14 @@ void drawTank(Tank t) {
 	);
 }
 
-void drawShot(Tank t, int tank_shot) {
-	float x = tank_shot
-		? t.shot.x + t.a
-		: t.A.x + t.center.x;
+void drawShot(Tank t) {
+	float x = t.is_shooting
+		? t.shot.x
+		: t.shot.x + t.center.x;
 
-	float y = tank_shot
-		? t.shot.y + t.b
-		: t.A.y + t.center.y;
+	float y = t.is_shooting
+		? t.shot.y
+		: t.shot.y + t.center.y;
 
 	al_draw_filled_circle(
 		x, 
@@ -123,14 +126,11 @@ void Rotate(Point *P, float angular_speed) {
 	P->y = ((y * cos(angular_speed)) + (x * sin(angular_speed)));
 }
 
-void rotateTank(Tank *t, int tank_shot) {
+void rotateTank(Tank *t) {
 	if (t->angular_speed != 0) {
 		Rotate(&t->A, t->angular_speed);
 		Rotate(&t->B, t->angular_speed);
 		Rotate(&t->C, t->angular_speed);
-		if (!tank_shot) {
-			Rotate(&t->shot, t->angular_speed);
-		}
 
 		t->angle += t->angular_speed;
 		t->x_vec = cos(t->angle);
@@ -138,30 +138,36 @@ void rotateTank(Tank *t, int tank_shot) {
 	}
 }
 
-void updateTank(Tank *t, int tank_shot) {
-	rotateTank(t, tank_shot);
+void updateTank(Tank *t) {
+	rotateTank(t);
 
 	t->center.y += t->speed * t->y_vec;
 	t->center.x += t->speed * t->x_vec;
 }
 
-void tankShot(Tank *t, int tank_shot) {
-	if (tank_shot) {
+void updateShot(Tank *t) {
+	if (t->is_shooting) {
 		t->shot.y += t->shot_speed * t->y_shot_vec;
 		t->shot.x += t->shot_speed * t->x_shot_vec;
+	} else {
+		Rotate(&t->shot, t->angular_speed);
 	}
 }
 
-void shotOutOfScreen(Tank *t, int *tank_shot) {
+void resetShotPosition(Tank *t) {
+	t->is_shooting = 0;
+	t->shot.x = t->A.x;
+	t->shot.y = t->A.y;
+}
+
+void shotOutOfScreen(Tank *t) {
 	if (
-		t->shot.x + t->a >= SCREEN_W + RADIUS_SHOT
-		|| t->shot.y + t->b >= SCREEN_H + RADIUS_SHOT
-		|| t->shot.x + t->a <= 0 - RADIUS_SHOT
-		|| t->shot.y + t->b <= 0 - RADIUS_SHOT
+		t->shot.x >= SCREEN_W + RADIUS_SHOT
+		|| t->shot.y >= SCREEN_H + RADIUS_SHOT
+		|| t->shot.x <= 0 - RADIUS_SHOT
+		|| t->shot.y <= 0 - RADIUS_SHOT
 	) {
-		*tank_shot = 0;
-		t->shot.x = t->A.x;
-		t->shot.y = t->A.y;
+		resetShotPosition(t);
 	}
 }
 
@@ -180,11 +186,10 @@ void collisionTankScreen(Tank *t) {
 }
 
 void collisionBetweenTanks(Tank *t1, Tank *t2) {
-	float distance_x = (t1->center.x - t2->center.x);
-	float distance_y = (t1->center.y - t2->center.y);
+	float distance_x = t1->center.x - t2->center.x;
+	float distance_y = t1->center.y - t2->center.y;
 	float sum_radius = RADIUS_FORCE_FIELD * 2;
 	float distanceBetweenCircles = sqrt(distance_x * distance_x + distance_y * distance_y);
-		printf("%.2f %.2f\n", t1->speed, t2->speed);
 
 	if (distanceBetweenCircles <= sum_radius) {
 		float distanceToMove = sum_radius - distanceBetweenCircles;
@@ -203,6 +208,36 @@ void collisionBetweenTanks(Tank *t1, Tank *t2) {
 		} else if (t2->speed > 0){
 			t2->center.x -= distanceToMove * t2->x_vec;
 			t2->center.y -= distanceToMove * t2->y_vec;
+		}
+	}
+}
+
+int collisionShotTank(Point c1, Point c2) {
+	float distance_x = c1.x - c2.x;
+	float distance_y = c1.y - c2.y;
+	float sum_radius = RADIUS_FORCE_FIELD + RADIUS_SHOT;
+	float distanceBetweenCircles = sqrt(distance_x * distance_x + distance_y * distance_y);
+
+	if (distanceBetweenCircles <= sum_radius) return 1;
+	return 0;
+}
+
+void collisionTankShot(Tank *t1, Tank *t2) {
+	int shot_collide = 0;
+	if (t1->is_shooting) {
+
+		shot_collide = collisionShotTank(t1->shot, t2->center);
+		if (shot_collide) {
+			t2->life -= 1;
+			resetShotPosition(t1);
+		}
+	} 
+	
+	if (t2->is_shooting) {
+		shot_collide = collisionShotTank(t2->shot, t1->center);
+		if (shot_collide) {
+			t1->life -= 1;
+			resetShotPosition(t2);
 		}
 	}
 }
@@ -281,8 +316,6 @@ int main(int argc, char **argv){
 	createTank(&tank_2, SCREEN_W - RADIUS_FORCE_FIELD, SCREEN_H / 2);
 	
 	int playing = 1;
-	int tank1_shot = 0;
-	int tank2_shot = 0;
 
 	while(playing) {
 		ALLEGRO_EVENT ev;
@@ -291,25 +324,27 @@ int main(int argc, char **argv){
 		if(ev.type == ALLEGRO_EVENT_TIMER) {
 			drawScenario();
 
-			updateTank(&tank_1, tank1_shot);
-			updateTank(&tank_2, tank2_shot);
+			updateTank(&tank_1);
+			updateShot(&tank_1);
+
+			updateTank(&tank_2);
+			updateShot(&tank_2);
 
 			collisionBetweenTanks(&tank_1, &tank_2);
+
+			shotOutOfScreen(&tank_1);
+			shotOutOfScreen(&tank_2);
 
 			collisionTankScreen(&tank_1);
 			collisionTankScreen(&tank_2);
 
-			tankShot(&tank_1, tank1_shot);
-			tankShot(&tank_2, tank2_shot);
-
-			shotOutOfScreen(&tank_1, &tank1_shot);
-			shotOutOfScreen(&tank_2, &tank2_shot);
+			collisionTankShot(&tank_1, &tank_2);
 
 			drawTank(tank_1);
-			drawShot(tank_1, tank1_shot);
+			drawShot(tank_1);
 
 			drawTank(tank_2);
-			drawShot(tank_2, tank2_shot);
+			drawShot(tank_2);
 
 			al_flip_display();
 		}
@@ -343,21 +378,21 @@ int main(int argc, char **argv){
 					tank_2.angular_speed += TANK_ANGULAR_SPEED;
 					break;
 				case ALLEGRO_KEY_Q:
-					if (!tank1_shot) {
-						tank1_shot = 1;
+					if (!tank_1.is_shooting) {
+						tank_1.is_shooting = 1;
 						tank_1.x_shot_vec = tank_1.x_vec;
 						tank_1.y_shot_vec = tank_1.y_vec;
-						tank_1.a = tank_1.center.x;
-						tank_1.b = tank_1.center.y;
+						tank_1.shot.x += tank_1.center.x;
+						tank_1.shot.y += tank_1.center.y;
 					}
 					break;
 				case ALLEGRO_KEY_ENTER:
-					if (!tank2_shot) {
-						tank2_shot = 1;
+					if (!tank_2.is_shooting) {
+						tank_2.is_shooting = 1;
 						tank_2.x_shot_vec = tank_2.x_vec;
 						tank_2.y_shot_vec = tank_2.y_vec;
-						tank_2.a = tank_2.center.x;
-						tank_2.b = tank_2.center.y;
+						tank_2.shot.x += tank_2.center.x;
+						tank_2.shot.y += tank_2.center.y;
 					}
 					break;
 				default:
