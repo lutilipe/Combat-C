@@ -78,7 +78,6 @@ static int checkCollisionTankShot(Point c1, Point c2) {
 void collisionTankShot(Tank *t1, Tank *t2) {
 	int shot_collide = 0;
 	if (t1->is_shooting) {
-
 		shot_collide = checkCollisionTankShot(t1->shot, t2->center);
 		if (shot_collide) {
 			t1->points += 1;
@@ -146,5 +145,33 @@ void collisionTankObstacle(Tank *t, Obstacle o) {
 	}
 }
 
+static int checkCollisionShotObstacle(Point p, Obstacle o) {
+    float retH = obstacleHeight(o);
+    float retW = obstacleWidth(o);
+    Point retCenter = obstacleCenter(o);
 
+    float distX = fabs(p.x - retCenter.x);
+    float distY = fabs(p.y - retCenter.y);
 
+	float dx = distX - retW / 2;
+    float dy = distY - retH / 2;
+	float diagonalDistance = sqrt(dx*dx+dy*dy);
+
+	if (distX > (retW / 2 + RADIUS_SHOT) 
+		|| distY > (retH / 2 + RADIUS_SHOT)) return 0;
+
+    if (distX <= (retW / 2)) return 1; 
+	if (distY <= (retH / 2)) return 1;
+
+    return diagonalDistance <= RADIUS_SHOT;
+}
+
+void collisionShotObstacle(Tank *t, Obstacle o) {
+	int shot_collide = 0;
+	if (t->is_shooting) {
+		shot_collide = checkCollisionShotObstacle(t->shot, o);
+		if (shot_collide) {
+			resetShotPosition(t);
+		}
+	} 
+}

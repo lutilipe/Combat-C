@@ -158,6 +158,9 @@ int main(int argc, char **argv){
 			collisionTankObstacle(&tank_1, o1);
 			collisionTankObstacle(&tank_2, o1);
 
+			collisionShotObstacle(&tank_1, o1);
+			collisionShotObstacle(&tank_2, o1);
+
 			shotOutOfScreen(&tank_1);
 			shotOutOfScreen(&tank_2);
 
