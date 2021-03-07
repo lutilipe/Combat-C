@@ -8,6 +8,7 @@
 #include <time.h>
 #include "tank.h"
 #include "collision.h"
+#include "obstacle.h"
 
 void drawScenario() {
 	al_clear_to_color(al_map_rgb(255, 255, 255));
@@ -42,6 +43,14 @@ void drawShot(Tank t) {
 		RADIUS_SHOT, 
 		t.color
 	);
+}
+
+void drawPoints(Tank t, ALLEGRO_FONT *font, float x, float y) {
+	al_draw_textf(font, t.color, x, y, ALLEGRO_ALIGN_CENTRE, "%i", t.points);
+}
+
+void drawObstacle(Obstacle o) {
+	al_draw_filled_rectangle(o.upper_left.x, o.upper_left.y, o.lower_right.x, o.lower_right.y, al_map_rgb(0, 0, 0));
 }
  
 int main(int argc, char **argv){
@@ -92,8 +101,8 @@ int main(int argc, char **argv){
 		return -1;
 	}
 	
-    ALLEGRO_FONT *size_32 = al_load_font("./assets/fonts/arial.ttf", 32, 1);   
-	if(size_32 == NULL) {
+    ALLEGRO_FONT *arcade_32 = al_load_font("./assets/fonts/8-BIT WONDER.ttf", 32, 1);   
+	if(arcade_32 == NULL) {
 		fprintf(stderr, "font file does not exist or cannot be accessed!\n");
 	}
 
@@ -116,6 +125,13 @@ int main(int argc, char **argv){
 
 	createTank(&tank_1, 0 + RADIUS_FORCE_FIELD, SCREEN_H / 2);
 	createTank(&tank_2, SCREEN_W - RADIUS_FORCE_FIELD, SCREEN_H / 2);
+
+	Obstacle o1;
+
+	o1.upper_left.x = 100;
+	o1.upper_left.y = 120;
+	o1.lower_right.x = 500;
+	o1.lower_right.y = 240;
 	
 	int playing = 1;
 
@@ -126,6 +142,10 @@ int main(int argc, char **argv){
 
 		if(ev.type == ALLEGRO_EVENT_TIMER) {
 			drawScenario();
+			drawObstacle(o1);
+
+			drawPoints(tank_1, arcade_32, 100, 30);
+			drawPoints(tank_2, arcade_32, SCREEN_W - 100, 30);
 
 			updateTank(&tank_1);
 			updateShot(&tank_1);
@@ -134,6 +154,9 @@ int main(int argc, char **argv){
 			updateShot(&tank_2);
 
 			collisionBetweenTanks(&tank_1, &tank_2);
+
+			collisionTankObstacle(&tank_1, o1);
+			collisionTankObstacle(&tank_2, o1);
 
 			shotOutOfScreen(&tank_1);
 			shotOutOfScreen(&tank_2);

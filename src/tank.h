@@ -5,11 +5,6 @@
 #ifndef TANK_H
 #define TANK_H
 
-typedef struct Point {
-	float x;
-	float y;
-} Point;
-
 typedef struct Tank {
 	Point center;
 	Point A, B, C;
@@ -24,7 +19,7 @@ typedef struct Tank {
 	float x_vec, y_vec, x_shot_vec, y_shot_vec;
 
 	int is_shooting;
-	int life;
+	int points;
 } Tank;
 
 void createTank(Tank *t, float startX, float startY);

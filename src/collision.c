@@ -1,4 +1,7 @@
 #include "collision.h"
+#include "obstacle.h"
+#include "tank.h"
+#include <stdio.h>
 
 static void resetShotPosition(Tank *t) {
 	t->is_shooting = 0;
@@ -43,7 +46,9 @@ void collisionBetweenTanks(Tank *t1, Tank *t2) {
 		if (t1->speed < 0) {
 			t1->center.x += distanceToMove * t1->x_vec;
 			t1->center.y += distanceToMove * t1->y_vec;
-		} else if (t1->speed > 0) {
+		} 
+		
+		if (t1->speed > 0) {
 			t1->center.x -= distanceToMove * t1->x_vec;
 			t1->center.y -= distanceToMove * t1->y_vec;
 		}
@@ -51,14 +56,16 @@ void collisionBetweenTanks(Tank *t1, Tank *t2) {
 		if (t2->speed < 0) {
 			t2->center.x += distanceToMove * t2->x_vec;
 			t2->center.y += distanceToMove * t2->y_vec;
-		} else if (t2->speed > 0){
+		} 
+		
+		if (t2->speed > 0){
 			t2->center.x -= distanceToMove * t2->x_vec;
 			t2->center.y -= distanceToMove * t2->y_vec;
 		}
 	}
 }
 
-static int collisionShotTank(Point c1, Point c2) {
+static int checkCollisionTankShot(Point c1, Point c2) {
 	float distance_x = c1.x - c2.x;
 	float distance_y = c1.y - c2.y;
 	float sum_radius = RADIUS_FORCE_FIELD + RADIUS_SHOT;
@@ -72,18 +79,72 @@ void collisionTankShot(Tank *t1, Tank *t2) {
 	int shot_collide = 0;
 	if (t1->is_shooting) {
 
-		shot_collide = collisionShotTank(t1->shot, t2->center);
+		shot_collide = checkCollisionTankShot(t1->shot, t2->center);
 		if (shot_collide) {
-			t2->life -= 1;
+			t1->points += 1;
 			resetShotPosition(t1);
 		}
 	} 
 	
 	if (t2->is_shooting) {
-		shot_collide = collisionShotTank(t2->shot, t1->center);
+		shot_collide = checkCollisionTankShot(t2->shot, t1->center);
 		if (shot_collide) {
-			t1->life -= 1;
+			t2->points += 1;
 			resetShotPosition(t2);
 		}
 	}
 }
+
+static float obstacleHeight(Obstacle o) {
+    return fabs(o.lower_right.y - o.upper_left.y);
+}
+
+static float obstacleWidth(Obstacle o) {
+    return fabs(o.upper_left.x - o.lower_right.x);
+}
+
+static Point obstacleCenter(Obstacle ret) {
+    Point centro;
+    centro.x = (ret.upper_left.x + ret.lower_right.x) / 2;
+    centro.y = (ret.upper_left.y + ret.lower_right.y) / 2;
+    return centro;
+}
+
+void collisionTankObstacle(Tank *t, Obstacle o) {
+	int collide = 0, distance = 0;
+
+    float retH = obstacleHeight(o);
+    float retW = obstacleWidth(o);
+    Point retCenter = obstacleCenter(o);
+
+    float distX = fabs(t->center.x - retCenter.x);
+    float distY = fabs(t->center.y - retCenter.y);
+
+	float dx = distX - retW / 2;
+    float dy = distY - retH / 2;
+	float diagonalDistance = sqrt(dx*dx+dy*dy);
+
+	if (distX > (retW / 2 + RADIUS_FORCE_FIELD) || distY > (retH / 2 + RADIUS_FORCE_FIELD)) collide = 0; 
+    else if (distX <= (retW / 2)) collide = 1; 
+	else if (distY <= (retH / 2)) collide = 2;
+    else if (diagonalDistance <= RADIUS_FORCE_FIELD) collide = 3;
+
+	float distanceToMove = 0;
+	
+	if (collide == 1) distanceToMove = (retH / 2) + RADIUS_FORCE_FIELD - distY;
+	else if (collide == 2) distanceToMove = (retW / 2) + RADIUS_FORCE_FIELD - distX;
+	else if (collide == 3) distanceToMove = RADIUS_FORCE_FIELD - diagonalDistance;
+
+	if (t->speed < 0) {
+		t->center.x += distanceToMove * t->x_vec;
+		t->center.y += distanceToMove * t->y_vec;
+	} 
+
+	if (t->speed > 0) {
+		t->center.x -= distanceToMove * t->x_vec;
+		t->center.y -= distanceToMove * t->y_vec;
+	}
+}
+
+
+

@@ -11,8 +11,13 @@
 #define RADIUS_FORCE_FIELD 30
 #define RADIUS_SHOT 6.0
 
-#define TANK_SPEED 2.5
+#define TANK_SPEED 3.5
 #define TANK_SHOT_SPEED 10
 #define TANK_ANGULAR_SPEED M_PI/90
+
+typedef struct Point {
+	float x;
+	float y;
+} Point;
 
 #endif

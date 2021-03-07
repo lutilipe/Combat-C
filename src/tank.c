@@ -1,7 +1,7 @@
 #include "tank.h"
 
 ALLEGRO_COLOR generate_random_color() {
-    return al_map_rgb(rand() % 256, rand() % 256, rand() % 256);
+    return al_map_rgb(rand() % 255, rand() % 255, rand() % 255);
 }
 
 void createTank(Tank *t, float startX, float startY) {
@@ -38,7 +38,7 @@ void createTank(Tank *t, float startX, float startY) {
 	t->y_shot_vec = sin(t->angle);
 
 	t->is_shooting = 0;
-	t->life = 0;
+	t->points = 0;
 }
 
 static void Rotate(Point *P, float angular_speed) {
