@@ -1,6 +1,6 @@
 #include "../include/tank.h"
 
-ALLEGRO_COLOR generate_random_color() {
+static ALLEGRO_COLOR generate_random_color() {
     return al_map_rgb(rand() % 255, rand() % 255, rand() % 255);
 }
 
@@ -76,12 +76,14 @@ void updateShot(Tank *t) {
 	}
 }
 
-void tankShot(Tank *t) {
+void tankShot(Tank *t, ALLEGRO_SAMPLE *sound) {
     if (!t->is_shooting) {
         t->is_shooting = 1;
         t->x_shot_vec = t->x_vec;
         t->y_shot_vec = t->y_vec;
         t->shot.x += t->center.x;
         t->shot.y += t->center.y;
+
+		al_play_sample(sound, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, 0);
     }
 }

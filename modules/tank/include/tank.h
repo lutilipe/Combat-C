@@ -1,6 +1,8 @@
 #include <math.h>
 
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 
 #include "../../../core/include/config.h"
 
@@ -28,6 +30,6 @@ void createTank(Tank *t, float startX, float startY);
 void rotateTank(Tank *t);
 void updateShot(Tank *t);
 void updateTank(Tank *t);
-void tankShot(Tank *t);
+void tankShot(Tank *t, ALLEGRO_SAMPLE *sound);
 
 #endif

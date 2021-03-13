@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "../include/collision.h"
 
 static void resetShotPosition(Tank *t) {
@@ -74,12 +72,13 @@ static int checkCollisionTankShot(Point c1, Point c2) {
 	return 0;
 }
 
-void collisionTankShot(Tank *t1, Tank *t2) {
+void collisionTankShot(Tank *t1, Tank *t2, ALLEGRO_SAMPLE *sound) {
 	int shot_collide = 0;
 	if (t1->is_shooting) {
 		shot_collide = checkCollisionTankShot(t1->shot, t2->center);
 		if (shot_collide) {
 			t1->points += 1;
+			al_play_sample(sound, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, 0);
 			resetShotPosition(t1);
 		}
 	} 
@@ -88,6 +87,7 @@ void collisionTankShot(Tank *t1, Tank *t2) {
 		shot_collide = checkCollisionTankShot(t2->shot, t1->center);
 		if (shot_collide) {
 			t2->points += 1;
+			al_play_sample(sound, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, 0);
 			resetShotPosition(t2);
 		}
 	}
@@ -165,11 +165,12 @@ static int checkCollisionShotObstacle(Point p, Obstacle o) {
     return diagonalDistance <= RADIUS_SHOT;
 }
 
-void collisionShotObstacle(Tank *t, Obstacle o) {
+void collisionShotObstacle(Tank *t, Obstacle o, ALLEGRO_SAMPLE *sound) {
 	int shot_collide = 0;
 	if (t->is_shooting) {
 		shot_collide = checkCollisionShotObstacle(t->shot, o);
 		if (shot_collide) {
+			al_play_sample(sound, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, 0);
 			resetShotPosition(t);
 		}
 	} 
