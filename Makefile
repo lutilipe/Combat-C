@@ -17,13 +17,13 @@ score.o:
 	gcc -c $(SOURCE_DIR)/score.c $(LIBS)
 
 tank.o:
-	gcc -c ./tank/src/tank.c $(LIBS)
+	gcc -c ./modules/tank/src/tank.c $(LIBS)
 
 collision.o:
-	gcc -c ./collision/src/collision.c $(LIBS)
+	gcc -c ./modules/collision/src/collision.c $(LIBS)
 
 drawer.o:
-	gcc -c ./drawer/src/drawer.c $(LIBS)
+	gcc -c ./modules/drawer/src/drawer.c $(LIBS)
 
 clean:
 	rm -r tank.o

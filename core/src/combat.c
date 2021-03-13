@@ -8,10 +8,10 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_image.h>
 
-#include "../../obstacle/include/obstacle.h"
-#include "../../tank/include/tank.h"
-#include "../../collision/include/collision.h"
-#include "../../drawer/include/drawer.h"
+#include "../../modules/obstacle/include/obstacle.h"
+#include "../../modules/tank/include/tank.h"
+#include "../../modules/collision/include/collision.h"
+#include "../../modules/drawer/include/drawer.h"
 #include "../include/score.h"
  
 int main(int argc, char **argv){

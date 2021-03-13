@@ -1,4 +1,4 @@
-#include "../../drawer/include/drawer.h"
+#include "../include/drawer.h"
 
 void drawScenario() {
 	al_clear_to_color(al_map_rgb(255, 255, 255));
