@@ -1,101 +1,18 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_image.h>
-#include <stdlib.h>
-#include <time.h>
-#include "tank.h"
-#include "collision.h"
-#include "obstacle.h"
 
-void drawScenario() {
-	al_clear_to_color(al_map_rgb(255, 255, 255));
-}
-
-void drawTank(Tank t) {
-	al_draw_circle(t.center.x, t.center.y, RADIUS_FORCE_FIELD, t.color, 1);
-
-	al_draw_filled_triangle(
-		t.A.x + t.center.x, 
-		t.A.y + t.center.y, 
-		t.B.x + t.center.x,
-		t.B.y + t.center.y,
-		t.C.x + t.center.x,
-		t.C.y + t.center.y,
-		t.color
-	);
-}
-
-int * getHistoryFromFile(char *fname) {
-    FILE *file;
-	static int score[2] = {0, 0};
-
-    if ((file = fopen(fname, "r"))) {
-		fscanf(file, "%i %i", &score[0], &score[1]);
-        fclose(file);
-    }
-
-	return score;
-}
-
-int * writeHistoryFile(char *fname, int winner) {
-	int *score = getHistoryFromFile(fname);
-	FILE *file;
-	score[winner - 1] += 1;
-	file = fopen(fname, "w");
-	fprintf(file, "%i %i", score[0], score[1]);
-	fclose(file);
-	return score;
-}
-
-void drawShot(Tank t) {
-	float x = t.is_shooting
-		? t.shot.x
-		: t.shot.x + t.center.x;
-
-	float y = t.is_shooting
-		? t.shot.y
-		: t.shot.y + t.center.y;
-
-	al_draw_filled_circle(
-		x, 
-		y, 
-		RADIUS_SHOT, 
-		t.color
-	);
-}
-
-void drawPoints(int point, ALLEGRO_COLOR color, ALLEGRO_FONT *font, float x, float y) {
-	al_draw_textf(font, color, x, y, ALLEGRO_ALIGN_CENTRE, "%i", point);
-}
-
-void drawScoreScreen(Tank t1, Tank t2, int *score, ALLEGRO_FONT *font) {
-	al_clear_to_color(al_map_rgb(255, 255, 255));
-	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, 100, ALLEGRO_ALIGN_CENTRE, "%s", "RESULTADO");
-	drawPoints(t1.points, t1.color, font, 400, 180);
-	al_draw_textf(font, al_map_rgb(0, 0, 0), 475, 180, ALLEGRO_ALIGN_CENTRE, "%s", "x");
-	drawPoints(t2.points, t2.color, font, 550, 180);
-	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, 300, ALLEGRO_ALIGN_CENTRE, "%s", "HISTORICO");
-	drawPoints(score[0], t1.color, font, 400, 380);
-	al_draw_textf(font, al_map_rgb(0, 0, 0), 475, 380, ALLEGRO_ALIGN_CENTRE, "%s", "x");
-	drawPoints(score[1], t2.color, font, 550, 380);
-}
-
-void drawObstacle(Obstacle o) {
-	al_draw_filled_rectangle(o.upper_left.x, o.upper_left.y, o.lower_right.x, o.lower_right.y, al_map_rgb(0, 0, 0));
-}
-
-int gameWinner(Tank t1, Tank t2) {
-	if (t1.points >= 5) {
-		return 1;
-	} else if (t2.points >= 5) {
-		return 2;
-	}
-
-	return 0;
-}
+#include "../../obstacle/include/obstacle.h"
+#include "../../tank/include/tank.h"
+#include "../../collision/include/collision.h"
+#include "../../drawer/include/drawer.h"
+#include "../include/score.h"
  
 int main(int argc, char **argv){
 	
@@ -188,7 +105,7 @@ int main(int argc, char **argv){
 		if(ev.type == ALLEGRO_EVENT_TIMER) {
 			if (gameWinner(tank_1, tank_2)) {
 				int *score, winner = gameWinner(tank_1, tank_2);
-				score = writeHistoryFile("historico.txt", winner);
+				score = writeHistoryFile("./historico.txt", winner);
 				time_t start = time(NULL);
 				while (time(NULL) - start <= 5) {
 					drawScoreScreen(tank_1, tank_2, score, arcade_32);

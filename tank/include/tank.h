@@ -1,6 +1,8 @@
-#include "config.h"
 #include <math.h>
+
 #include <allegro5/allegro.h>
+
+#include "../../core/include/config.h"
 
 #ifndef TANK_H
 #define TANK_H

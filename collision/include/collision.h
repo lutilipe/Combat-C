@@ -1,5 +1,5 @@
-#include "tank.h"
-#include "obstacle.h"
+#include "../../obstacle/include/obstacle.h"
+#include "../../tank/include/tank.h"
 
 #ifndef COLLISION_H
 #define COLLISION_H

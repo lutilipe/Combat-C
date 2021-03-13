@@ -1,4 +1,4 @@
-#include "tank.h"
+#include "../include/tank.h"
 
 ALLEGRO_COLOR generate_random_color() {
     return al_map_rgb(rand() % 255, rand() % 255, rand() % 255);
