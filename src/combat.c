@@ -28,6 +28,28 @@ void drawTank(Tank t) {
 	);
 }
 
+int * getHistoryFromFile(char *fname) {
+    FILE *file;
+	static int score[2] = {0, 0};
+
+    if ((file = fopen(fname, "r"))) {
+		fscanf(file, "%i %i", &score[0], &score[1]);
+        fclose(file);
+    }
+
+	return score;
+}
+
+int * writeHistoryFile(char *fname, int winner) {
+	int *score = getHistoryFromFile(fname);
+	FILE *file;
+	score[winner - 1] += 1;
+	file = fopen(fname, "w");
+	fprintf(file, "%i %i", score[0], score[1]);
+	fclose(file);
+	return score;
+}
+
 void drawShot(Tank t) {
 	float x = t.is_shooting
 		? t.shot.x
@@ -45,12 +67,34 @@ void drawShot(Tank t) {
 	);
 }
 
-void drawPoints(Tank t, ALLEGRO_FONT *font, float x, float y) {
-	al_draw_textf(font, t.color, x, y, ALLEGRO_ALIGN_CENTRE, "%i", t.points);
+void drawPoints(int point, ALLEGRO_COLOR color, ALLEGRO_FONT *font, float x, float y) {
+	al_draw_textf(font, color, x, y, ALLEGRO_ALIGN_CENTRE, "%i", point);
+}
+
+void drawScoreScreen(Tank t1, Tank t2, int *score, ALLEGRO_FONT *font) {
+	al_clear_to_color(al_map_rgb(255, 255, 255));
+	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, 100, ALLEGRO_ALIGN_CENTRE, "%s", "RESULTADO");
+	drawPoints(t1.points, t1.color, font, 400, 180);
+	al_draw_textf(font, al_map_rgb(0, 0, 0), 475, 180, ALLEGRO_ALIGN_CENTRE, "%s", "x");
+	drawPoints(t2.points, t2.color, font, 550, 180);
+	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, 300, ALLEGRO_ALIGN_CENTRE, "%s", "HISTORICO");
+	drawPoints(score[0], t1.color, font, 400, 380);
+	al_draw_textf(font, al_map_rgb(0, 0, 0), 475, 380, ALLEGRO_ALIGN_CENTRE, "%s", "x");
+	drawPoints(score[1], t2.color, font, 550, 380);
 }
 
 void drawObstacle(Obstacle o) {
 	al_draw_filled_rectangle(o.upper_left.x, o.upper_left.y, o.lower_right.x, o.lower_right.y, al_map_rgb(0, 0, 0));
+}
+
+int gameWinner(Tank t1, Tank t2) {
+	if (t1.points >= 5) {
+		return 1;
+	} else if (t2.points >= 5) {
+		return 2;
+	}
+
+	return 0;
 }
  
 int main(int argc, char **argv){
@@ -134,6 +178,7 @@ int main(int argc, char **argv){
 	o1.lower_right.y = 240;
 	
 	int playing = 1;
+	int winner = 0;
 
 	while(playing) {
 		ALLEGRO_EVENT ev;
@@ -141,41 +186,53 @@ int main(int argc, char **argv){
 		al_wait_for_event(event_queue, &ev);
 
 		if(ev.type == ALLEGRO_EVENT_TIMER) {
-			drawScenario();
-			drawObstacle(o1);
+			if (gameWinner(tank_1, tank_2)) {
+				int *score, winner = gameWinner(tank_1, tank_2);
+				score = writeHistoryFile("historico.txt", winner);
+				time_t start = time(NULL);
+				while (time(NULL) - start <= 5) {
+					drawScoreScreen(tank_1, tank_2, score, arcade_32);
+					al_flip_display();
+				}
+				playing = 0;
 
-			drawPoints(tank_1, arcade_32, 100, 30);
-			drawPoints(tank_2, arcade_32, SCREEN_W - 100, 30);
+			} else {
+				drawScenario();
+				drawObstacle(o1);
 
-			updateTank(&tank_1);
-			updateShot(&tank_1);
+				drawPoints(tank_1.points, tank_1.color, arcade_32, 100, 30);
+				drawPoints(tank_2.points, tank_2.color, arcade_32, SCREEN_W - 100, 30);
 
-			updateTank(&tank_2);
-			updateShot(&tank_2);
+				updateTank(&tank_1);
+				updateShot(&tank_1);
 
-			collisionBetweenTanks(&tank_1, &tank_2);
+				updateTank(&tank_2);
+				updateShot(&tank_2);
 
-			collisionTankObstacle(&tank_1, o1);
-			collisionTankObstacle(&tank_2, o1);
+				collisionBetweenTanks(&tank_1, &tank_2);
 
-			collisionShotObstacle(&tank_1, o1);
-			collisionShotObstacle(&tank_2, o1);
+				collisionTankObstacle(&tank_1, o1);
+				collisionTankObstacle(&tank_2, o1);
 
-			shotOutOfScreen(&tank_1);
-			shotOutOfScreen(&tank_2);
+				collisionShotObstacle(&tank_1, o1);
+				collisionShotObstacle(&tank_2, o1);
 
-			collisionTankScreen(&tank_1);
-			collisionTankScreen(&tank_2);
+				shotOutOfScreen(&tank_1);
+				shotOutOfScreen(&tank_2);
 
-			collisionTankShot(&tank_1, &tank_2);
+				collisionTankScreen(&tank_1);
+				collisionTankScreen(&tank_2);
 
-			drawTank(tank_1);
-			drawShot(tank_1);
+				collisionTankShot(&tank_1, &tank_2);
 
-			drawTank(tank_2);
-			drawShot(tank_2);
+				drawTank(tank_1);
+				drawShot(tank_1);
 
-			al_flip_display();
+				drawTank(tank_2);
+				drawShot(tank_2);
+
+				al_flip_display();
+			}
 		}
 		else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			playing = 0;
