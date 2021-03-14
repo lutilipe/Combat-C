@@ -10,11 +10,13 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
-#include "../../modules/obstacle/include/obstacle.h"
-#include "../../modules/tank/include/tank.h"
-#include "../../modules/collision/include/collision.h"
-#include "../../modules/drawer/include/drawer.h"
-#include "../include/score.h"
+#include "../../modules/includes/obstacle.h"
+#include "../../modules/includes/tank.h"
+#include "../../modules/includes/collision.h"
+#include "../../modules/includes/drawer.h"
+
+#include "../../screens/includes/score.h"
+#include "../../screens/includes/game.h"
  
 int main(int argc, char **argv){
 	
@@ -23,9 +25,11 @@ int main(int argc, char **argv){
 	ALLEGRO_TIMER *timer = NULL;
 
 	ALLEGRO_SAMPLE *shotSample = NULL;
-	ALLEGRO_SAMPLE *shotHitBlockSample = NULL;
-	ALLEGRO_SAMPLE *shotHitTankSample = NULL;
-	ALLEGRO_SAMPLE *winSample = NULL;
+	ALLEGRO_SAMPLE *shot_hit_block_sample = NULL;
+	ALLEGRO_SAMPLE *shot_hit_tank_sample = NULL;
+	ALLEGRO_SAMPLE *win_sample = NULL;
+
+	int screen = GAME_SCREEN;
 
 	srand(time(NULL));
    
@@ -77,9 +81,9 @@ int main(int argc, char **argv){
 	al_reserve_samples(10);
 
 	shotSample = al_load_sample("./assets/sounds/shot.wav");
-	shotHitBlockSample = al_load_sample("./assets/sounds/hit_block.wav");
-	shotHitTankSample = al_load_sample("./assets/sounds/hit_tank.wav");
-	winSample = al_load_sample("./assets/sounds/win.wav");
+	shot_hit_block_sample = al_load_sample("./assets/sounds/hit_block.wav");
+	shot_hit_tank_sample = al_load_sample("./assets/sounds/hit_tank.wav");
+	win_sample = al_load_sample("./assets/sounds/win.wav");
 
 	if(!al_init_ttf_addon()) {
 		fprintf(stderr, "failed to load tff font module!\n");
@@ -108,8 +112,8 @@ int main(int argc, char **argv){
 	Tank tank_1;
 	Tank tank_2;
 
-	createTank(&tank_1, 0 + RADIUS_FORCE_FIELD, SCREEN_H / 2);
-	createTank(&tank_2, SCREEN_W - RADIUS_FORCE_FIELD, SCREEN_H / 2);
+	createTank(&tank_1, TANK_1_INIT_POS_X, TANK_1_INIT_POS_Y);
+	createTank(&tank_2, TANK_2_INIT_POS_X, TANK_2_INIT_POS_Y);
 
 	Obstacle o1;
 
@@ -127,53 +131,35 @@ int main(int argc, char **argv){
 		al_wait_for_event(event_queue, &ev);
 
 		if(ev.type == ALLEGRO_EVENT_TIMER) {
-			if (gameWinner(tank_1, tank_2)) {
-				int *score, winner = gameWinner(tank_1, tank_2);
-				score = writeHistoryFile("./historico.txt", winner);
-				al_play_sample(winSample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, 0);
-				time_t start = time(NULL);
-				while (time(NULL) - start <= 5) {
-					drawScoreScreen(tank_1, tank_2, score, arcade_32);
-					al_flip_display();
+			gameWinner(tank_1, tank_2, &winner, &screen);
+
+			switch (screen) {
+				case MENU_SCREEN:
+					break;
+				case GAME_SCREEN: {
+					renderGame(
+						&tank_1,
+						&tank_2,
+						o1,
+						arcade_32,
+						shot_hit_block_sample,
+						shot_hit_tank_sample
+					);
+					break;
 				}
-				playing = 0;
-
-			} else {
-				drawScenario();
-				drawObstacle(o1);
-
-				drawPoints(tank_1.points, tank_1.color, arcade_32, 100, 30);
-				drawPoints(tank_2.points, tank_2.color, arcade_32, SCREEN_W - 100, 30);
-
-				updateTank(&tank_1);
-				updateShot(&tank_1);
-
-				updateTank(&tank_2);
-				updateShot(&tank_2);
-
-				collisionBetweenTanks(&tank_1, &tank_2);
-
-				collisionTankObstacle(&tank_1, o1);
-				collisionTankObstacle(&tank_2, o1);
-
-				collisionShotObstacle(&tank_1, o1, shotHitBlockSample);
-				collisionShotObstacle(&tank_2, o1, shotHitBlockSample);
-
-				shotOutOfScreen(&tank_1);
-				shotOutOfScreen(&tank_2);
-
-				collisionTankScreen(&tank_1);
-				collisionTankScreen(&tank_2);
-
-				collisionTankShot(&tank_1, &tank_2, shotHitTankSample);
-
-				drawTank(tank_1);
-				drawShot(tank_1);
-
-				drawTank(tank_2);
-				drawShot(tank_2);
-
-				al_flip_display();
+				case SCORE_SCREEN: {
+					renderScore(
+						tank_1,
+						tank_2,
+						winner,
+						win_sample,
+						arcade_32
+					);
+					playing = 0;
+					break;
+				}
+				default:
+					break;
 			}
 		}
 		else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
@@ -252,9 +238,9 @@ int main(int argc, char **argv){
 	al_destroy_display(display);
 	al_destroy_event_queue(event_queue);
 	al_destroy_sample(shotSample);
-	al_destroy_sample(shotHitBlockSample);
-	al_destroy_sample(shotHitTankSample);
-	al_destroy_sample(winSample);
+	al_destroy_sample(shot_hit_block_sample);
+	al_destroy_sample(shot_hit_tank_sample);
+	al_destroy_sample(win_sample);
 
 	return 0;
 }

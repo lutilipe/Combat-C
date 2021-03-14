@@ -2,9 +2,9 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 
-#include "../../obstacle/include/obstacle.h"
-#include "../../tank/include/tank.h"
-#include "../../collision/include/collision.h"
+#include "./obstacle.h"
+#include "./tank.h"
+#include "./collision.h"
 
 #ifndef DRAWER_H
 #define DRAWER_H

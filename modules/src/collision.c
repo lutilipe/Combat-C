@@ -1,4 +1,4 @@
-#include "../include/collision.h"
+#include "../includes/collision.h"
 
 static void resetShotPosition(Tank *t) {
 	t->is_shooting = 0;

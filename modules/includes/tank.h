@@ -4,10 +4,16 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
-#include "../../../core/include/config.h"
+#include "../../core/includes/config.h"
 
 #ifndef TANK_H
 #define TANK_H
+
+#define TANK_1_INIT_POS_X RADIUS_FORCE_FIELD
+#define TANK_1_INIT_POS_Y SCREEN_H / 2
+
+#define TANK_2_INIT_POS_X SCREEN_W - RADIUS_FORCE_FIELD
+#define TANK_2_INIT_POS_Y SCREEN_H / 2
 
 typedef struct Tank {
 	Point center;

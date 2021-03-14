@@ -1,4 +1,4 @@
-#include "../include/tank.h"
+#include "../includes/tank.h"
 
 static ALLEGRO_COLOR generate_random_color() {
     return al_map_rgb(rand() % 255, rand() % 255, rand() % 255);
@@ -62,7 +62,6 @@ void rotateTank(Tank *t) {
 
 void updateTank(Tank *t) {
 	rotateTank(t);
-
 	t->center.y += t->speed * t->y_vec;
 	t->center.x += t->speed * t->x_vec;
 }

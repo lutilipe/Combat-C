@@ -1,4 +1,4 @@
-#include "../../../core/include/config.h"
+#include "../../core/includes/config.h"
 
 #ifndef OBSTACLE_H
 #define OBSTACLE_H
