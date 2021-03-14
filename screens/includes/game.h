@@ -7,7 +7,7 @@
 #define GAME_H
 
 void gameWinner(Tank t1, Tank t2, int *winner, int *screen);
-
+void restartGame(Tank *t1, Tank *t2, int *winner, int *screen);
 void renderGame(
     Tank *t1, 
     Tank *t2, 

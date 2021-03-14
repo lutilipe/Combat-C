@@ -11,7 +11,8 @@ void renderScore(
     Tank t2, 
     int winner, 
     ALLEGRO_SAMPLE *win, 
-    ALLEGRO_FONT *score_font
+    ALLEGRO_FONT *score_font,
+    ALLEGRO_EVENT_QUEUE *queue
 );
 
 #endif

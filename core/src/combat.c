@@ -132,7 +132,6 @@ int main(int argc, char **argv){
 
 		if(ev.type == ALLEGRO_EVENT_TIMER) {
 			gameWinner(tank_1, tank_2, &winner, &screen);
-
 			switch (screen) {
 				case MENU_SCREEN:
 					break;
@@ -153,9 +152,10 @@ int main(int argc, char **argv){
 						tank_2,
 						winner,
 						win_sample,
-						arcade_32
+						arcade_32,
+						event_queue
 					);
-					playing = 0;
+					restartGame(&tank_1, &tank_2, &winner, &screen);
 					break;
 				}
 				default:
@@ -165,7 +165,7 @@ int main(int argc, char **argv){
 		else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			playing = 0;
 		}
-		else if(ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+		else if(ev.type == ALLEGRO_EVENT_KEY_DOWN && screen == GAME_SCREEN) {
 			switch (ev.keyboard.keycode) {
 				case ALLEGRO_KEY_W:
 					tank_1.speed -= TANK_SPEED;
@@ -201,7 +201,7 @@ int main(int argc, char **argv){
 					break;
 			}
 		}
-		else if(ev.type == ALLEGRO_EVENT_KEY_UP) {
+		else if(ev.type == ALLEGRO_EVENT_KEY_UP && screen == GAME_SCREEN) {
 			switch (ev.keyboard.keycode) {
 				case ALLEGRO_KEY_W:
 					tank_1.speed += TANK_SPEED;

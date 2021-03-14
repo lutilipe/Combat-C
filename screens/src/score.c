@@ -24,13 +24,17 @@ void renderScore(
 	Tank t2, 
 	int winner, 
 	ALLEGRO_SAMPLE *win, 
-	ALLEGRO_FONT *score_font
+	ALLEGRO_FONT *score_font,
+	ALLEGRO_EVENT_QUEUE *queue
 ) {
+	ALLEGRO_TIMEOUT timeout;
+   	ALLEGRO_EVENT event;
+
 	int score[2] = {0, 0};
 	writeHistoryFile("./historico.txt", winner, score);
 	al_play_sample(win, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, 0);
-	time_t start = time(NULL);
-	while (time(NULL) - start <= 5) {
+	al_init_timeout(&timeout, 5);
+	while (al_wait_for_event_until(queue, &event, &timeout)) {
 		drawScoreScreen(t1, t2, score, score_font);
 		al_flip_display();
 	}

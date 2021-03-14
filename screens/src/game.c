@@ -1,5 +1,13 @@
 #include "../includes/game.h"
 
+void restartGame(Tank *t1, Tank *t2, int *winner, int *screen) {
+    *winner = 0;
+    *screen = GAME_SCREEN;
+
+	createTank(t1, TANK_1_INIT_POS_X, TANK_1_INIT_POS_Y);
+	createTank(t2, TANK_2_INIT_POS_X, TANK_2_INIT_POS_Y);
+}
+
 void gameWinner(Tank t1, Tank t2, int *winner, int *screen) {
 	if (t1.points >= 5) {
 		*winner = 1;
