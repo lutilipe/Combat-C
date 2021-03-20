@@ -9,7 +9,12 @@ static int randomInt(int max) {
 }
 
 static float randomX() {
-    return MARGIN_OF_SECURITY + randomInt(MAX_X_POSITION - MARGIN_OF_SECURITY + 1);
+    int x = MARGIN_OF_SECURITY + randomInt(MAX_X_POSITION - MARGIN_OF_SECURITY + 1);
+    if (x + MIN_WIDTH >= MAX_X_POSITION) {
+        return MAX_X_POSITION - MIN_WIDTH;
+    }
+    
+    return x;
 }
 
 static float randomY() {
