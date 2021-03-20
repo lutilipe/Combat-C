@@ -11,7 +11,7 @@
 #define RADIUS_FORCE_FIELD 30
 #define RADIUS_SHOT 6.0
 
-#define TANK_SPEED 5
+#define TANK_SPEED 4
 #define TANK_SHOT_SPEED 15
 #define TANK_ANGULAR_SPEED M_PI/80
 
