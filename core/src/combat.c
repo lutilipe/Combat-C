@@ -130,8 +130,6 @@ int main(int argc, char **argv){
 		if(ev.type == ALLEGRO_EVENT_TIMER) {
 			gameWinner(tank_1, tank_2, &winner, &screen);
 			switch (screen) {
-				case MENU_SCREEN:
-					break;
 				case GAME_SCREEN: {
 					renderGame(
 						&tank_1,

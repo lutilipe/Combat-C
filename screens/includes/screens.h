@@ -14,7 +14,6 @@
 #define SCREENS_H
 
 enum SCREEN { 
-    MENU_SCREEN,
     GAME_SCREEN, 
     SCORE_SCREEN
 };
