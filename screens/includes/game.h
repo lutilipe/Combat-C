@@ -11,7 +11,7 @@ void restartGame(Tank *t1, Tank *t2, int *winner, int *screen);
 void renderGame(
     Tank *t1, 
     Tank *t2, 
-    Obstacle o1,
+    Obstacle *obstacles,
     ALLEGRO_FONT *points_font, 
     ALLEGRO_SAMPLE *shot_hit_block, 
     ALLEGRO_SAMPLE *shot_hit_tank

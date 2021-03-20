@@ -3,8 +3,8 @@
 
 #define FPS 60  
 
-#define SCREEN_W 960
-#define SCREEN_H 540
+#define SCREEN_W 1270
+#define SCREEN_H 720
 
 #define THETA M_PI/4
 
@@ -14,6 +14,8 @@
 #define TANK_SPEED 3.5
 #define TANK_SHOT_SPEED 12
 #define TANK_ANGULAR_SPEED M_PI/90
+
+#define NUMBER_OF_OBSTACLES 4
 
 typedef struct Point {
 	float x;

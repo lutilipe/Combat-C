@@ -115,13 +115,10 @@ int main(int argc, char **argv){
 	createTank(&tank_1, TANK_1_INIT_POS_X, TANK_1_INIT_POS_Y);
 	createTank(&tank_2, TANK_2_INIT_POS_X, TANK_2_INIT_POS_Y);
 
-	Obstacle o1;
+	Obstacle* obstacles = malloc(2 * NUMBER_OF_OBSTACLES * sizeof *obstacles);
 
-	o1.upper_left.x = 100;
-	o1.upper_left.y = 120;
-	o1.lower_right.x = 500;
-	o1.lower_right.y = 240;
-	
+	createObstacles(obstacles);
+
 	int playing = 1;
 	int winner = 0;
 
@@ -139,7 +136,7 @@ int main(int argc, char **argv){
 					renderGame(
 						&tank_1,
 						&tank_2,
-						o1,
+						obstacles,
 						arcade_32,
 						shot_hit_block_sample,
 						shot_hit_tank_sample
@@ -241,6 +238,7 @@ int main(int argc, char **argv){
 	al_destroy_sample(shot_hit_block_sample);
 	al_destroy_sample(shot_hit_tank_sample);
 	al_destroy_sample(win_sample);
+	free(obstacles);
 
 	return 0;
 }

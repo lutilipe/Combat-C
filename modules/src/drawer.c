@@ -41,14 +41,14 @@ void drawPoints(int point, ALLEGRO_COLOR color, ALLEGRO_FONT *font, float x, flo
 
 void drawScoreScreen(Tank t1, Tank t2, int *score, ALLEGRO_FONT *font) {
 	al_clear_to_color(al_map_rgb(255, 255, 255));
-	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, 100, ALLEGRO_ALIGN_CENTRE, "%s", "RESULTADO");
-	drawPoints(t1.points, t1.color, font, 400, 180);
-	al_draw_textf(font, al_map_rgb(0, 0, 0), 475, 180, ALLEGRO_ALIGN_CENTRE, "%s", "x");
-	drawPoints(t2.points, t2.color, font, 550, 180);
-	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, 300, ALLEGRO_ALIGN_CENTRE, "%s", "HISTORICO");
-	drawPoints(score[0], t1.color, font, 400, 380);
-	al_draw_textf(font, al_map_rgb(0, 0, 0), 475, 380, ALLEGRO_ALIGN_CENTRE, "%s", "x");
-	drawPoints(score[1], t2.color, font, 550, 380);
+	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, SCREEN_H * 0.125, ALLEGRO_ALIGN_CENTRE, "%s", "RESULTADO");
+	drawPoints(t1.points, t1.color, font, SCREEN_W * 0.42, SCREEN_H * 0.25);
+	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, SCREEN_H * 0.25, ALLEGRO_ALIGN_CENTRE, "%s", "x");
+	drawPoints(t2.points, t2.color, font, SCREEN_W * 0.58, SCREEN_H * 0.25);
+	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, SCREEN_H * 0.5, ALLEGRO_ALIGN_CENTRE, "%s", "HISTORICO");
+	drawPoints(score[0], t1.color, font, SCREEN_W * 0.42, SCREEN_H * 0.625);
+	al_draw_textf(font, al_map_rgb(0, 0, 0), SCREEN_W / 2, SCREEN_H * 0.625, ALLEGRO_ALIGN_CENTRE, "%s", "x");
+	drawPoints(score[1], t2.color, font, SCREEN_W * 0.58, SCREEN_H * 0.625);
 }
 
 void drawObstacle(Obstacle o) {
