@@ -1,5 +1,4 @@
 #include "../includes/obstacle.h"
-#include <stdio.h>
 
 const int MARGIN_OF_SECURITY = RADIUS_FORCE_FIELD * 2 + 10;
 const int MAX_X_POSITION = SCREEN_W / 2;
