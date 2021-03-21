@@ -4,7 +4,7 @@ ifeq ($(OS),Windows_NT)
 
 ALLEGRO_VERSION=5.0.10
 MINGW_VERSION=4.7.0
-FOLDER=C:
+FOLDER=.\libs
 
 FOLDER_NAME=\allegro-$(ALLEGRO_VERSION)-mingw-$(MINGW_VERSION)
 PATH_ALLEGRO=$(FOLDER)$(FOLDER_NAME)
@@ -14,10 +14,10 @@ INCLUDE_ALLEGRO=\include
 all: tank.o obstacle.o collision.o drawer.o score.o game.o combat clean execute
 
 execute:
-	./combat
+	.\combat.exe
 
 combat: combat.o
-	gcc -o combat obstacle.o combat.o tank.o collision.o score.o drawer.o game.o
+	gcc -o combat.exe obstacle.o combat.o tank.o collision.o score.o drawer.o game.o $(PATH_ALLEGRO)$(LIB_ALLEGRO)
 
 combat.o:
 	gcc -I $(PATH_ALLEGRO)$(INCLUDE_ALLEGRO) -c $(SOURCE_DIR)/combat.c
