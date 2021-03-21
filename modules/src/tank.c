@@ -48,7 +48,7 @@ static void Rotate(Point *P, float angular_speed) {
 	P->y = ((y * cos(angular_speed)) + (x * sin(angular_speed)));
 }
 
-void rotateTank(Tank *t) {
+static void rotateTank(Tank *t) {
 	if (t->angular_speed != 0) {
 		Rotate(&t->A, t->angular_speed);
 		Rotate(&t->B, t->angular_speed);

@@ -33,7 +33,6 @@ typedef struct Tank {
 } Tank;
 
 void createTank(Tank *t, float startX, float startY);
-void rotateTank(Tank *t);
 void updateShot(Tank *t);
 void updateTank(Tank *t);
 void tankShot(Tank *t, ALLEGRO_SAMPLE *sound);
