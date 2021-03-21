@@ -150,7 +150,7 @@ int main(int argc, char **argv){
 						arcade_32,
 						event_queue
 					);
-					restartGame(&tank_1, &tank_2, &winner, &screen);
+					restartGame(&tank_1, &tank_2, obstacles, &winner, &screen);
 					break;
 				}
 				default:
