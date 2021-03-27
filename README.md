@@ -15,6 +15,8 @@
 
 ### Executando
 
+Execute o comando abaixo na raíz do projeto
+
 ```console
 $ make
 ```
