@@ -85,6 +85,8 @@ int main(int argc, char **argv){
 	shot_hit_tank_sample = al_load_sample("./assets/sounds/hit_tank.wav");
 	win_sample = al_load_sample("./assets/sounds/win.wav");
 
+	al_set_window_position(display, 100, 60);
+
 	if(!al_init_ttf_addon()) {
 		fprintf(stderr, "failed to load tff font module!\n");
 		return -1;
