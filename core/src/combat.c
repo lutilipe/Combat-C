@@ -101,6 +101,11 @@ int main(int argc, char **argv){
 		al_destroy_display(display);
 		return -1;
 	}
+
+	int x, y;
+	al_get_window_position(display, &x, &y);
+	printf("%i %i\n", x, y);
+	al_set_window_position(display, x, y);
    
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
