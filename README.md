@@ -17,6 +17,11 @@
 
 Execute o comando abaixo na raíz do projeto
 
+Windows
+```console
+$ ./combat.exe
+```
+Linux
 ```console
 $ make
 ```
