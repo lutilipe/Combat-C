@@ -102,10 +102,9 @@ int main(int argc, char **argv){
 		return -1;
 	}
 
-	int x, y;
-	al_get_window_position(display, &x, &y);
-	printf("%i %i\n", x, y);
-	al_set_window_position(display, x, y);
+	int SCREEN_X, SCREEN_Y;
+	al_get_window_position(display, &SCREEN_X, &SCREEN_Y);
+	al_set_window_position(display, SCREEN_X, SCREEN_Y);
    
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
