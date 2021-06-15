@@ -11,7 +11,7 @@
 ### Pré-requisitos
 
  - GCC
- - Allegro5 (Linux only)
+ - Allegro5
 
 ### Executando
 
